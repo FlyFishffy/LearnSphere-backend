@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyfish.learnsphere.mapper.CourseMapper">
+
+    <insert id="addCourse" parameterType="com.flyfish.learnsphere.model.entity.Course" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course(title, description, upload_user_id, cover_url, category, tags, status, create_time, update_time, is_deleted)
+        VALUES (#{title}, #{description}, #{uploadUserId}, #{coverUrl}, #{category}, #{tags}, #{status}, #{createTime}, #{updateTime}, #{isDeleted})
+    </insert>
+
+    <select id="getCourseById" resultType="com.flyfish.learnsphere.model.entity.Course">
+        SELECT * FROM course WHERE id = #{courseId}
+    </select>
+
+    <update id="updateCourse" parameterType="com.flyfish.learnsphere.model.entity.Course">
+        UPDATE course
+        <set>
+            <if test="title != null">
+                title = #{title},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="uploadUserId != null">
+                upload_user_id = #{uploadUserId},
+            </if>
+            <if test="coverUrl != null">
+                cover_url = #{coverUrl},
+            </if>
+            <if test="category != null">
+                category = #{category},
+            </if>
+            <if test="tags != null">
+                tags = #{tags},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            <if test="isDeleted != null">
+                is_deleted = #{isDeleted},
+            </if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+        AND is_deleted = 0
+    </update>
+</mapper>
