@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyfish.learnsphere.mapper.LearningRecordMapper">
+
+    <select id="getByUserCourse" resultType="com.flyfish.learnsphere.model.entity.LearningRecord">
+        SELECT id,
+               user_id AS userId,
+               course_id AS courseId,
+               progress_percent AS progressPercent,
+               current_second AS currentSecond,
+               total_seconds AS totalSeconds,
+               total_study_seconds AS totalStudySeconds,
+               last_learning_time AS lastLearningTime,
+               create_time AS createTime,
+               update_time AS updateTime
+        FROM learning_record
+        WHERE user_id = #{userId}
+          AND course_id = #{courseId}
+        LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.flyfish.learnsphere.model.entity.LearningRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO learning_record(user_id, course_id, progress_percent, current_second, total_seconds,
+                                    total_study_seconds, last_learning_time, create_time, update_time)
+        VALUES (#{userId}, #{courseId}, #{progressPercent}, #{currentSecond}, #{totalSeconds},
+                #{totalStudySeconds}, #{lastLearningTime}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update" parameterType="com.flyfish.learnsphere.model.entity.LearningRecord">
+        UPDATE learning_record
+        <set>
+            <if test="progressPercent != null">
+                progress_percent = #{progressPercent},
+            </if>
+            <if test="currentSecond != null">
+                current_second = #{currentSecond},
+            </if>
+            <if test="totalSeconds != null">
+                total_seconds = #{totalSeconds},
+            </if>
+            <if test="totalStudySeconds != null">
+                total_study_seconds = #{totalStudySeconds},
+            </if>
+            <if test="lastLearningTime != null">
+                last_learning_time = #{lastLearningTime},
+            </if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="listByUser" resultType="com.flyfish.learnsphere.model.entity.LearningRecord">
+        SELECT id,
+               user_id AS userId,
+               course_id AS courseId,
+               progress_percent AS progressPercent,
+               current_second AS currentSecond,
+               total_seconds AS totalSeconds,
+               total_study_seconds AS totalStudySeconds,
+               last_learning_time AS lastLearningTime,
+               create_time AS createTime,
+               update_time AS updateTime
+        FROM learning_record
+        WHERE user_id = #{userId}
+        ORDER BY update_time DESC
+    </select>
+
+</mapper>

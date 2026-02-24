@@ -4,6 +4,7 @@ package com.flyfish.learnsphere.service;
 import com.flyfish.learnsphere.model.dto.ChatRequest;
 import com.flyfish.learnsphere.model.vo.MessageVO;
 import dev.langchain4j.data.message.ChatMessage;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ public interface ChatService {
      * @param userId
      * @return
      */
-    String ask(ChatRequest chatRequest, Long userId);
+    SseEmitter ask(ChatRequest chatRequest, Long userId);
 
 
     /**

@@ -26,7 +26,15 @@ public class Course {
 
     private String tags;
 
+    private String contentMd;
+
+    private String videoUrl;
+
+    private Integer videoDuration;
+
     private Integer status;
+
+
 
     private LocalDateTime createTime;
 

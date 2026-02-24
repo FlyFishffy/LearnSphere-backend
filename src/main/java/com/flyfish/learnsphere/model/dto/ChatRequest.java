@@ -15,4 +15,8 @@ public class ChatRequest {
 
     // todo 用于保存上下文记忆
     private String sessionId;
+
+    // 可选：课程ID，用于课程知识库问答
+    private Long courseId;
+
 }

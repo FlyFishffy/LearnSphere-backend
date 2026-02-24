@@ -23,4 +23,11 @@ public class UpdateCourseRequest {
     private Integer category;
 
     private List<Integer> tags;
+
+    private String contentMd;
+
+    private String videoUrl;
+
+    private Integer videoDuration;
+
 }

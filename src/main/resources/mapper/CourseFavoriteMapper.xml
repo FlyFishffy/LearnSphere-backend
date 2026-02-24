@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyfish.learnsphere.mapper.CourseFavoriteMapper">
+
+    <select id="exists" resultType="boolean">
+        SELECT CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE END
+        FROM course_favorite
+        WHERE user_id = #{userId}
+          AND course_id = #{courseId}
+    </select>
+
+    <insert id="insert" parameterType="com.flyfish.learnsphere.model.entity.CourseFavorite" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO course_favorite(user_id, course_id, create_time)
+        VALUES (#{userId}, #{courseId}, #{createTime})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM course_favorite
+        WHERE user_id = #{userId}
+          AND course_id = #{courseId}
+    </delete>
+
+    <select id="listCourseIdsByUser" resultType="long">
+        SELECT course_id FROM course_favorite
+        WHERE user_id = #{userId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="countByUser" resultType="int">
+        SELECT COUNT(*) FROM course_favorite WHERE user_id = #{userId}
+    </select>
+
+</mapper>

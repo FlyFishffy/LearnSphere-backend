@@ -5,9 +5,10 @@
 <mapper namespace="com.flyfish.learnsphere.mapper.CourseMapper">
 
     <insert id="addCourse" parameterType="com.flyfish.learnsphere.model.entity.Course" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO course(title, description, upload_user_id, cover_url, category, tags, status, create_time, update_time, is_deleted)
-        VALUES (#{title}, #{description}, #{uploadUserId}, #{coverUrl}, #{category}, #{tags}, #{status}, #{createTime}, #{updateTime}, #{isDeleted})
+        INSERT INTO course(title, description, upload_user_id, cover_url, category, tags, content_md, video_url, video_duration, status, create_time, update_time, is_deleted)
+        VALUES (#{title}, #{description}, #{uploadUserId}, #{coverUrl}, #{category}, #{tags}, #{contentMd}, #{videoUrl}, #{videoDuration}, #{status}, #{createTime}, #{updateTime}, #{isDeleted})
     </insert>
+
 
     <select id="getCourseById" resultType="com.flyfish.learnsphere.model.entity.Course">
         SELECT * FROM course WHERE id = #{courseId}
@@ -34,9 +35,20 @@
             <if test="tags != null">
                 tags = #{tags},
             </if>
+            <if test="contentMd != null">
+                content_md = #{contentMd},
+            </if>
+            <if test="videoUrl != null">
+                video_url = #{videoUrl},
+            </if>
+            <if test="videoDuration != null">
+                video_duration = #{videoDuration},
+            </if>
             <if test="status != null">
                 status = #{status},
             </if>
+
+
             <if test="isDeleted != null">
                 is_deleted = #{isDeleted},
             </if>
@@ -45,4 +57,34 @@
         WHERE id = #{id}
         AND is_deleted = 0
     </update>
+
+    <select id="listCourses" resultType="com.flyfish.learnsphere.model.entity.Course">
+        SELECT * FROM course
+        WHERE is_deleted = 0
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%') OR description LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+        <if test="tag != null and tag != ''">
+            AND tags LIKE CONCAT('%', #{tag}, '%')
+        </if>
+        ORDER BY update_time DESC
+    </select>
+
+    <update id="deleteCourse">
+        UPDATE course SET is_deleted = 1, update_time = NOW()
+        WHERE id = #{courseId}
+    </update>
+
+    <select id="listByIds" resultType="com.flyfish.learnsphere.model.entity.Course">
+        SELECT * FROM course
+        WHERE is_deleted = 0
+        AND id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        ORDER BY update_time DESC
+    </select>
 </mapper>

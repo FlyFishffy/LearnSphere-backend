@@ -15,6 +15,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
 
@@ -38,8 +39,9 @@ public class ChatController {
      * @param chatRequest
      * @return
      */
+    // todo 改成流式响应
     @PostMapping("/ask")
-    public Result<String> ask(@RequestBody ChatRequest chatRequest, HttpServletRequest request) {
+    public SseEmitter ask(@RequestBody ChatRequest chatRequest, HttpServletRequest request) {
         User user = userService.getLoginUser(request);
         if(user == null){
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
@@ -47,8 +49,7 @@ public class ChatController {
         if(chatRequest == null){
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        String answer = chatService.ask(chatRequest, user.getId());
-        return ResultUtils.success(answer);
+        return chatService.ask(chatRequest, user.getId());
     }
 
 

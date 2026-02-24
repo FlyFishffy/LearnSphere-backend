@@ -1,9 +1,11 @@
 package com.flyfish.learnsphere.model.dto;
 
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.Data;
 
 import java.util.List;
+
 
 /**
  * 新增课程请求
@@ -17,9 +19,18 @@ public class AddCourseRequest {
 
     private String description;
 
-    private String cover_url;
+    @JsonAlias({"cover_url"})
+    private String coverUrl;
+
 
     private Integer category;
 
     private List<Integer> tags;
+
+    private String contentMd;
+
+    private String videoUrl;
+
+    private Integer videoDuration;
+
 }

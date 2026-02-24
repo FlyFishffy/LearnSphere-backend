@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyfish.learnsphere.mapper.CourseChunkEmbeddingMapper">
+
+    <delete id="deleteByCourseId">
+        DELETE FROM course_chunk_embedding WHERE course_id = #{courseId}
+    </delete>
+
+    <insert id="insertBatch">
+        INSERT INTO course_chunk_embedding(course_id, chunk_index, text, vector_json, create_time)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.courseId}, #{item.chunkIndex}, #{item.text}, #{item.vectorJson}, #{item.createTime})
+        </foreach>
+    </insert>
+
+    <select id="listByCourseId" resultType="com.flyfish.learnsphere.model.entity.CourseChunkEmbedding">
+        SELECT id, course_id AS courseId, chunk_index AS chunkIndex, text, vector_json AS vectorJson, create_time AS createTime
+        FROM course_chunk_embedding
+        WHERE course_id = #{courseId}
+        ORDER BY chunk_index ASC
+    </select>
+
+    <select id="countByCourseId" resultType="int">
+        SELECT COUNT(*) FROM course_chunk_embedding WHERE course_id = #{courseId}
+    </select>
+
+</mapper>
+

@@ -1,0 +1,34 @@
+server:
+  port: 8888
+  servlet:
+    session:
+      cookie:
+        max-age: 2592000
+      timeout: 24h
+    context-path: /api
+
+spring:
+  data:
+    redis:
+      host: 139.155.45.80
+      port: 6379
+      password: 1145237870
+      database: 0
+      connect-timeout: 5000ms
+  application:
+    name: LearnSphere
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://139.155.45.80:3306/learn_sphere
+    username: admin
+    password: 1145237870
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+
+deepseek:
+  apiKey: sk-4c23e69e0b8340f2b2729d01a6150e68
+
