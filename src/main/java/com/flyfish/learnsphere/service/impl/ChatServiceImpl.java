@@ -4,9 +4,11 @@ package com.flyfish.learnsphere.service.impl;
 import com.flyfish.learnsphere.exception.BusinessException;
 import com.flyfish.learnsphere.memory.RedisChatMemoryStore;
 import com.flyfish.learnsphere.model.dto.ChatRequest;
+import com.flyfish.learnsphere.model.entity.Course;
 import com.flyfish.learnsphere.model.enums.ErrorCode;
 import com.flyfish.learnsphere.model.vo.MessageVO;
 import com.flyfish.learnsphere.service.ChatService;
+import com.flyfish.learnsphere.service.CourseService;
 import com.flyfish.learnsphere.service.RagService;
 
 import dev.langchain4j.data.message.AiMessage;
@@ -37,15 +39,21 @@ public class ChatServiceImpl implements ChatService {
     private final RedisChatMemoryStore chatMemoryStore;
     private final StreamingChatLanguageModel streamingChatLanguageModel;
     private final RagService ragService;
+    private final CourseService courseService;
+
+    // Max characters of contentMd to inject directly when no RAG index exists
+    private static final int MAX_DIRECT_CONTENT_LENGTH = 3000;
 
     public ChatServiceImpl(ChatLanguageModel chatLanguageModel,
                            RedisChatMemoryStore chatMemoryStore,
                            StreamingChatLanguageModel streamingChatLanguageModel,
-                           RagService ragService) {
+                           RagService ragService,
+                           CourseService courseService) {
         this.chatLanguageModel = chatLanguageModel;
         this.chatMemoryStore = chatMemoryStore;
         this.streamingChatLanguageModel = streamingChatLanguageModel;
         this.ragService = ragService;
+        this.courseService = courseService;
     }
 
 
@@ -75,10 +83,34 @@ public class ChatServiceImpl implements ChatService {
         if (courseId != null) {
             List<String> chunks = ragService.retrieveRelevantChunks(courseId, question);
             if (!chunks.isEmpty()) {
+                // RAG 检索成功，使用向量检索结果
                 String context = String.join("\n---\n", chunks);
                 messages.add(SystemMessage.systemMessage(
                         "以下是课程知识库中与问题相关的内容片段，请优先基于它们回答：\n" + context
                 ));
+            } else {
+                // RAG 索引不存在，fallback：直接将课程全文注入上下文，并异步触发索引构建
+                Course course = courseService.getCourseById(courseId);
+                if (course != null && course.getContentMd() != null && !course.getContentMd().trim().isEmpty()) {
+                    String contentMd = course.getContentMd();
+                    // 内容过长时截取前 MAX_DIRECT_CONTENT_LENGTH 字符，避免超出 token 限制
+                    String context = contentMd.length() > MAX_DIRECT_CONTENT_LENGTH
+                            ? contentMd.substring(0, MAX_DIRECT_CONTENT_LENGTH) + "\n...(内容已截断)"
+                            : contentMd;
+                    messages.add(SystemMessage.systemMessage(
+                            "以下是当前课程《" + course.getTitle() + "》的完整内容，请基于它回答用户问题：\n" + context
+                    ));
+                    // 异步触发索引构建，下次提问时可使用向量检索
+                    final String finalContentMd = contentMd;
+                    new Thread(() -> {
+                        try {
+                            ragService.indexCourseContent(courseId, finalContentMd);
+                            log.info("Auto-indexed course {} in background", courseId);
+                        } catch (Exception e) {
+                            log.warn("Background indexing failed for courseId={}: {}", courseId, e.getMessage());
+                        }
+                    }).start();
+                }
             }
         }
 

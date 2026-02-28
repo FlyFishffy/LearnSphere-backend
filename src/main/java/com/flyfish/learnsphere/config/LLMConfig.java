@@ -24,6 +24,15 @@ public class LLMConfig {
     @Value("${deepseek.apiKey}")
     private String apiKey;
 
+    @Value("${embedding.apiKey:${deepseek.apiKey}}")
+    private String embeddingApiKey;
+
+    @Value("${embedding.baseUrl:https://api.openai.com/v1}")
+    private String embeddingBaseUrl;
+
+    @Value("${embedding.modelName:text-embedding-3-small}")
+    private String embeddingModelName;
+
     @Bean
     public ChatLanguageModel deepseekChatModel(){
         return OpenAiChatModel.builder()
@@ -53,9 +62,9 @@ public class LLMConfig {
     @Bean
     public EmbeddingModel embeddingModel() {
         return OpenAiEmbeddingModel.builder()
-                .apiKey(apiKey)
-                .baseUrl("https://api.deepseek.com/v1")
-                .modelName("text-embedding-3-small") // deepseek 兼容
+                .apiKey(embeddingApiKey)
+                .baseUrl(embeddingBaseUrl)
+                .modelName(embeddingModelName)
                 .build();
     }
 }

@@ -3,6 +3,7 @@ package com.flyfish.learnsphere.model.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @Author: FlyFish
@@ -10,6 +11,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class CourseChunkEmbedding {
     private Long id;
     private Long courseId;

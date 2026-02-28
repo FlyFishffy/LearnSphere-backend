@@ -22,6 +22,12 @@ spring:
     url: jdbc:mysql://139.155.45.80:3306/learn_sphere
     username: admin
     password: 1145237870
+  # PostgreSQL 数据源（用于 RAG 向量存储）
+  vector-datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://139.155.45.80:5432/learn_sphere_vector?sslmode=disable
+    username: postgres
+    password: hyf1145237870
 
 mybatis:
   mapper-locations: classpath:/mapper/*.xml
@@ -31,4 +37,10 @@ mybatis:
 
 deepseek:
   apiKey: sk-4c23e69e0b8340f2b2729d01a6150e68
+
+# Embedding 模型配置（使用 OpenAI text-embedding-3-small，或替换为其他兼容服务）
+embedding:
+  apiKey: sk-4c23e69e0b8340f2b2729d01a6150e68          # 替换为你的 OpenAI API Key（如 sk-xxx）
+  baseUrl: https://api.openai.com/v1  # 如使用代理或其他服务商，修改此处
+  modelName: text-embedding-3-small
 

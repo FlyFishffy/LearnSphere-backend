@@ -2,7 +2,6 @@ package com.flyfish.learnsphere.controller;
 
 import com.flyfish.learnsphere.annotaion.AuthCheck;
 import com.flyfish.learnsphere.exception.BusinessException;
-import com.flyfish.learnsphere.mapper.CourseChunkEmbeddingMapper;
 import com.flyfish.learnsphere.model.entity.Course;
 import com.flyfish.learnsphere.model.entity.Result;
 import com.flyfish.learnsphere.model.enums.ErrorCode;
@@ -11,6 +10,8 @@ import com.flyfish.learnsphere.service.RagService;
 import com.flyfish.learnsphere.utils.ResultUtils;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,12 +31,11 @@ public class RagController {
     private CourseService courseService;
 
     @Resource
-    private CourseChunkEmbeddingMapper embeddingMapper;
+    @Qualifier("vectorJdbcTemplate")
+    private JdbcTemplate vectorJdbcTemplate;
 
     /**
      * 重建课程知识库索引
-     * @param courseId
-     * @return
      */
     @PostMapping("/index/{courseId}")
     @AuthCheck(value = {"Teacher", "Admin"})
@@ -48,24 +48,20 @@ public class RagController {
         return ResultUtils.success(true);
     }
 
-
     /**
      * 查看课程知识库切片数量
-     * @param courseId
-     * @return
      */
     @GetMapping("/status/{courseId}")
     @AuthCheck(value = {"Teacher", "Admin"})
     public Result<Integer> getCourseIndexStatus(@PathVariable Long courseId) {
-        int count = embeddingMapper.countByCourseId(courseId);
-        return ResultUtils.success(count);
+        Integer count = vectorJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM course_chunk_embedding WHERE course_id = ?",
+                Integer.class, courseId);
+        return ResultUtils.success(count == null ? 0 : count);
     }
-
 
     /**
      * 删除课程知识库索引
-     * @param courseId
-     * @return
      */
     @DeleteMapping("/index/{courseId}")
     @AuthCheck(value = {"Teacher", "Admin"})
