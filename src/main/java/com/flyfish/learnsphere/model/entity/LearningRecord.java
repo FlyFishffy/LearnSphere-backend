@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 学习记录
+ * Learning record entity for document-based progress tracking
  * @Author: FlyFish
  * @CreateTime: 2026/02/18
  */
@@ -18,12 +18,24 @@ public class LearningRecord {
 
     private Long courseId;
 
+    /**
+     * Reading progress percentage (0-100), calculated by scrollPosition / contentLength * 100
+     */
     private Integer progressPercent;
 
-    private Integer currentSecond;
+    /**
+     * Current scroll position in the document (characters read)
+     */
+    private Integer scrollPosition;
 
-    private Integer totalSeconds;
+    /**
+     * Total content length of the document (total characters)
+     */
+    private Integer contentLength;
 
+    /**
+     * Total accumulated study duration in seconds
+     */
     private Integer totalStudySeconds;
 
     private LocalDateTime lastLearningTime;

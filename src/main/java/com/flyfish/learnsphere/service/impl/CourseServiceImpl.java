@@ -12,7 +12,9 @@ import com.flyfish.learnsphere.model.enums.CourseTag;
 import com.flyfish.learnsphere.model.enums.ErrorCode;
 import com.flyfish.learnsphere.model.enums.RoleType;
 import com.flyfish.learnsphere.service.CourseService;
+import com.flyfish.learnsphere.service.RagService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -25,11 +27,15 @@ import java.util.List;
  * @Author: FlyFish
  * @CreateTime: 2025/11/23
  */
+@Slf4j
 @Service
 public class CourseServiceImpl implements CourseService{
 
     @Resource
     private CourseMapper courseMapper;
+
+    @Resource
+    private RagService ragService;
 
     /**
      * 添加课程
@@ -121,6 +127,21 @@ public class CourseServiceImpl implements CourseService{
         course.setVideoDuration(updateCourseRequest.getVideoDuration());
 
         courseMapper.updateCourse(course);
+
+        // Auto-rebuild knowledge index when contentMd is updated
+        if (updateCourseRequest.getContentMd() != null && !updateCourseRequest.getContentMd().trim().isEmpty()) {
+            final Long cId = updateCourseRequest.getId();
+            final String md = updateCourseRequest.getContentMd();
+            new Thread(() -> {
+                try {
+                    ragService.indexCourseContent(cId, md);
+                    log.info("Auto re-indexed knowledge base for courseId={} after content update", cId);
+                } catch (Exception e) {
+                    log.warn("Failed to auto re-index courseId={}: {}", cId, e.getMessage());
+                }
+            }).start();
+        }
+
         return true;
     }
 

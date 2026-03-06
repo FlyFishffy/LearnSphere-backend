@@ -9,8 +9,8 @@
                user_id AS userId,
                course_id AS courseId,
                progress_percent AS progressPercent,
-               current_second AS currentSecond,
-               total_seconds AS totalSeconds,
+               scroll_position AS scrollPosition,
+               content_length AS contentLength,
                total_study_seconds AS totalStudySeconds,
                last_learning_time AS lastLearningTime,
                create_time AS createTime,
@@ -22,9 +22,9 @@
     </select>
 
     <insert id="insert" parameterType="com.flyfish.learnsphere.model.entity.LearningRecord" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO learning_record(user_id, course_id, progress_percent, current_second, total_seconds,
+        INSERT INTO learning_record(user_id, course_id, progress_percent, scroll_position, content_length,
                                     total_study_seconds, last_learning_time, create_time, update_time)
-        VALUES (#{userId}, #{courseId}, #{progressPercent}, #{currentSecond}, #{totalSeconds},
+        VALUES (#{userId}, #{courseId}, #{progressPercent}, #{scrollPosition}, #{contentLength},
                 #{totalStudySeconds}, #{lastLearningTime}, #{createTime}, #{updateTime})
     </insert>
 
@@ -34,11 +34,11 @@
             <if test="progressPercent != null">
                 progress_percent = #{progressPercent},
             </if>
-            <if test="currentSecond != null">
-                current_second = #{currentSecond},
+            <if test="scrollPosition != null">
+                scroll_position = #{scrollPosition},
             </if>
-            <if test="totalSeconds != null">
-                total_seconds = #{totalSeconds},
+            <if test="contentLength != null">
+                content_length = #{contentLength},
             </if>
             <if test="totalStudySeconds != null">
                 total_study_seconds = #{totalStudySeconds},
@@ -56,8 +56,8 @@
                user_id AS userId,
                course_id AS courseId,
                progress_percent AS progressPercent,
-               current_second AS currentSecond,
-               total_seconds AS totalSeconds,
+               scroll_position AS scrollPosition,
+               content_length AS contentLength,
                total_study_seconds AS totalStudySeconds,
                last_learning_time AS lastLearningTime,
                create_time AS createTime,

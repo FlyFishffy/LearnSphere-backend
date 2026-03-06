@@ -8,6 +8,10 @@ server:
     context-path: /api
 
 spring:
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
   data:
     redis:
       host: 139.155.45.80
@@ -40,7 +44,7 @@ deepseek:
 
 # Embedding 模型配置（使用 OpenAI text-embedding-3-small，或替换为其他兼容服务）
 embedding:
-  apiKey: sk-4c23e69e0b8340f2b2729d01a6150e68          # 替换为你的 OpenAI API Key（如 sk-xxx）
-  baseUrl: https://api.openai.com/v1  # 如使用代理或其他服务商，修改此处
-  modelName: text-embedding-3-small
+  apiKey: sk-jukrrynguxrbxzxvznnchunoagtboacincovlqtwvapzxmue         # 替换为你的 OpenAI API Key（如 sk-xxx）
+  baseUrl: https://api.siliconflow.cn/v1  # 如使用代理或其他服务商，修改此处
+  modelName: BAAI/bge-m3 
 

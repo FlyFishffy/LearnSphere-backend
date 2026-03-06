@@ -18,6 +18,14 @@ public class CourseChunkEmbedding {
     private Integer chunkIndex;
     private String text;
     private String vectorJson;
+    /**
+     * Section heading context for this chunk (e.g. "## Chapter 1 > ### 1.1 Introduction")
+     */
+    private String heading;
+    /**
+     * Source of the chunk: "markdown", "pdf", "docx", "txt", or "manual"
+     */
+    private String source;
     private java.time.LocalDateTime createTime;
 }
 

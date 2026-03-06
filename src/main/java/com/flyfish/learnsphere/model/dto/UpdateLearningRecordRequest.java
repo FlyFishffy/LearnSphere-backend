@@ -3,7 +3,7 @@ package com.flyfish.learnsphere.model.dto;
 import lombok.Data;
 
 /**
- * 学习记录更新请求
+ * Learning record update request for document-based progress
  * @Author: FlyFish
  * @CreateTime: 2026/02/18
  */
@@ -12,14 +12,18 @@ public class UpdateLearningRecordRequest {
 
     private Long courseId;
 
-    private Integer progressPercent;
-
-    private Integer currentSecond;
-
-    private Integer totalSeconds;
+    /**
+     * Current scroll position in the document (characters the user has read up to)
+     */
+    private Integer scrollPosition;
 
     /**
-     * 本次学习新增时长（秒）
+     * Total content length of the document (total characters)
+     */
+    private Integer contentLength;
+
+    /**
+     * Incremental study duration for this session (seconds)
      */
     private Integer studySecondsIncrement;
 }

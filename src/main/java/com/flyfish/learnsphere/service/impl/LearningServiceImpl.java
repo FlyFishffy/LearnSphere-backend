@@ -48,30 +48,33 @@ public class LearningServiceImpl implements LearningService {
         if (request == null || request.getCourseId() == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "courseId required");
         }
-        validateProgress(request.getProgressPercent());
+        // Auto-calculate progress percent from scroll position and content length
+        int progressPercent = calcProgressPercent(request.getScrollPosition(), request.getContentLength());
         LearningRecord record = learningRecordMapper.getByUserCourse(userId, request.getCourseId());
         LocalDateTime now = LocalDateTime.now();
         if (record == null) {
             LearningRecord newRecord = new LearningRecord();
             newRecord.setUserId(userId);
             newRecord.setCourseId(request.getCourseId());
-            newRecord.setProgressPercent(defaultIfNull(request.getProgressPercent(), 0));
-            newRecord.setCurrentSecond(request.getCurrentSecond());
-            newRecord.setTotalSeconds(request.getTotalSeconds());
+            newRecord.setProgressPercent(progressPercent);
+            newRecord.setScrollPosition(defaultIfNull(request.getScrollPosition(), 0));
+            newRecord.setContentLength(defaultIfNull(request.getContentLength(), 0));
             newRecord.setTotalStudySeconds(defaultIfNull(request.getStudySecondsIncrement(), 0));
             newRecord.setLastLearningTime(now);
             newRecord.setCreateTime(now);
             newRecord.setUpdateTime(now);
             learningRecordMapper.insert(newRecord);
         } else {
-            if (request.getProgressPercent() != null) {
-                record.setProgressPercent(request.getProgressPercent());
+            // Only update progress if the new position is further than the previous one
+            if (request.getScrollPosition() != null) {
+                int oldPosition = defaultIfNull(record.getScrollPosition(), 0);
+                if (request.getScrollPosition() > oldPosition) {
+                    record.setScrollPosition(request.getScrollPosition());
+                    record.setProgressPercent(progressPercent);
+                }
             }
-            if (request.getCurrentSecond() != null) {
-                record.setCurrentSecond(request.getCurrentSecond());
-            }
-            if (request.getTotalSeconds() != null) {
-                record.setTotalSeconds(request.getTotalSeconds());
+            if (request.getContentLength() != null) {
+                record.setContentLength(request.getContentLength());
             }
             if (request.getStudySecondsIncrement() != null) {
                 record.setTotalStudySeconds(safeAdd(record.getTotalStudySeconds(), request.getStudySecondsIncrement()));
@@ -209,13 +212,15 @@ public class LearningServiceImpl implements LearningService {
         return new ArrayList<>(result.values());
     }
 
-    private void validateProgress(Integer progressPercent) {
-        if (progressPercent == null) {
-            return;
+    /**
+     * Calculate reading progress percentage from scroll position and content length
+     */
+    private int calcProgressPercent(Integer scrollPosition, Integer contentLength) {
+        if (scrollPosition == null || contentLength == null || contentLength <= 0) {
+            return 0;
         }
-        if (progressPercent < 0 || progressPercent > 100) {
-            throw new BusinessException(ErrorCode.PARAMS_ERROR, "progressPercent 0-100");
-        }
+        int percent = (int) Math.round((double) scrollPosition / contentLength * 100);
+        return Math.max(0, Math.min(100, percent));
     }
 
     private int defaultIfNull(Integer value, int defaultValue) {
