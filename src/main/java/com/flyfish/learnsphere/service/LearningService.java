@@ -30,4 +30,13 @@ public interface LearningService {
     LearningReportVO getReport(Long userId);
 
     List<Course> getRecommendations(Long userId, Integer limit);
+
+    /**
+     * Get home page recommended courses based on user preferences.
+     * If userId is null (not logged in), return random courses.
+     * @param userId nullable user id
+     * @param limit number of courses to return
+     * @return recommended course list
+     */
+    List<Course> getHomeRecommendations(Long userId, int limit);
 }

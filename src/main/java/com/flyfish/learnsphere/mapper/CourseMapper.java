@@ -64,4 +64,15 @@ public interface CourseMapper {
      * @return
      */
     List<Course> listByIds(@Param("ids") List<Long> ids);
+
+    /**
+     * Randomly select courses, optionally filtered by categories and tags
+     * @param categories category filter list (nullable)
+     * @param tags tag filter list (nullable)
+     * @param limit max number of courses to return
+     * @return random course list
+     */
+    List<Course> listRandomCourses(@Param("categories") List<String> categories,
+                                   @Param("tags") List<String> tags,
+                                   @Param("limit") int limit);
 }

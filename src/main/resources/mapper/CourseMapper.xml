@@ -87,4 +87,24 @@
         </foreach>
         ORDER BY update_time DESC
     </select>
+
+    <select id="listRandomCourses" resultType="com.flyfish.learnsphere.model.entity.Course">
+        SELECT * FROM course
+        WHERE is_deleted = 0
+        <if test="categories != null and categories.size() > 0">
+            AND category IN
+            <foreach collection="categories" item="cat" open="(" separator="," close=")">
+                #{cat}
+            </foreach>
+        </if>
+        <if test="tags != null and tags.size() > 0">
+            AND (
+            <foreach collection="tags" item="tag" separator=" OR ">
+                tags LIKE CONCAT('%', #{tag}, '%')
+            </foreach>
+            )
+        </if>
+        ORDER BY RAND()
+        LIMIT #{limit}
+    </select>
 </mapper>

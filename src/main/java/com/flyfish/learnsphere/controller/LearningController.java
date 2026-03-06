@@ -84,4 +84,20 @@ public class LearningController {
         User user = userService.getLoginUser(httpRequest);
         return ResultUtils.success(learningService.getRecommendations(user.getId(), limit));
     }
+
+    @GetMapping("/home-recommend")
+    public Result<List<Course>> getHomeRecommendations(@RequestParam(required = false, defaultValue = "3") Integer limit,
+                                                       HttpServletRequest httpRequest) {
+        // Allow anonymous access: if not logged in, userId is null
+        Long userId = null;
+        try {
+            User user = userService.getLoginUser(httpRequest);
+            if (user != null) {
+                userId = user.getId();
+            }
+        } catch (Exception ignored) {
+            // Not logged in, proceed with null userId
+        }
+        return ResultUtils.success(learningService.getHomeRecommendations(userId, limit));
+    }
 }

@@ -332,4 +332,62 @@ public class LearningServiceImpl implements LearningService {
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Course> getHomeRecommendations(Long userId, int limit) {
+        if (userId == null) {
+            // Not logged in: return random courses
+            return courseMapper.listRandomCourses(null, null, limit);
+        }
+
+        // Logged in: analyze preferences from learning records and favorites
+        List<LearningRecord> records = learningRecordMapper.listByUser(userId);
+        List<Long> favoriteIds = courseFavoriteMapper.listCourseIdsByUser(userId);
+
+        List<Course> historyCourses = new ArrayList<>();
+        historyCourses.addAll(listCoursesByIds(records.stream().map(LearningRecord::getCourseId).toList()));
+        historyCourses.addAll(listCoursesByIds(favoriteIds == null ? List.of() : favoriteIds));
+
+        Map<String, Integer> tagCount = new HashMap<>();
+        Map<String, Integer> categoryCount = new HashMap<>();
+        for (Course course : historyCourses) {
+            if (course == null) continue;
+            if (course.getCategory() != null) {
+                categoryCount.merge(course.getCategory(), 1, Integer::sum);
+            }
+            for (String tag : splitTags(course.getTags())) {
+                tagCount.merge(tag, 1, Integer::sum);
+            }
+        }
+
+        List<String> topCategories = sortTopKeys(categoryCount, 3);
+        List<String> topTags = sortTopKeys(tagCount, 5);
+
+        if (topCategories.isEmpty() && topTags.isEmpty()) {
+            // No preferences yet: return random courses
+            return courseMapper.listRandomCourses(null, null, limit);
+        }
+
+        // Get random courses matching user preferences
+        List<Course> recommended = courseMapper.listRandomCourses(
+                topCategories.isEmpty() ? null : topCategories,
+                topTags.isEmpty() ? null : topTags,
+                limit
+        );
+
+        // If not enough, fill with random courses
+        if (recommended.size() < limit) {
+            Set<Long> existingIds = recommended.stream().map(Course::getId).collect(Collectors.toSet());
+            List<Course> filler = courseMapper.listRandomCourses(null, null, limit);
+            for (Course c : filler) {
+                if (recommended.size() >= limit) break;
+                if (!existingIds.contains(c.getId())) {
+                    recommended.add(c);
+                    existingIds.add(c.getId());
+                }
+            }
+        }
+
+        return recommended;
+    }
 }
