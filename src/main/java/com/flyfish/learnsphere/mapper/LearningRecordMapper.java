@@ -1,6 +1,7 @@
 package com.flyfish.learnsphere.mapper;
 
 import com.flyfish.learnsphere.model.entity.LearningRecord;
+import com.flyfish.learnsphere.model.vo.LearningRecordVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,4 +22,6 @@ public interface LearningRecordMapper {
     int update(LearningRecord record);
 
     List<LearningRecord> listByUser(@Param("userId") Long userId);
+
+    List<LearningRecordVO> listByUserWithTitle(@Param("userId") Long userId);
 }

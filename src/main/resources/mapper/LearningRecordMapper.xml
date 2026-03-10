@@ -67,4 +67,22 @@
         ORDER BY update_time DESC
     </select>
 
+    <select id="listByUserWithTitle" resultType="com.flyfish.learnsphere.model.vo.LearningRecordVO">
+        SELECT lr.id,
+               lr.user_id AS userId,
+               lr.course_id AS courseId,
+               c.title AS courseTitle,
+               lr.progress_percent AS progressPercent,
+               lr.scroll_position AS scrollPosition,
+               lr.content_length AS contentLength,
+               lr.total_study_seconds AS totalStudySeconds,
+               lr.last_learning_time AS lastLearningTime,
+               lr.create_time AS createTime,
+               lr.update_time AS updateTime
+        FROM learning_record lr
+        LEFT JOIN course c ON lr.course_id = c.id
+        WHERE lr.user_id = #{userId}
+        ORDER BY lr.update_time DESC
+    </select>
+
 </mapper>

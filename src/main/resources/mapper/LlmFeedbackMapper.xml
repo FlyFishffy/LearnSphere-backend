@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.flyfish.learnsphere.mapper.LlmFeedbackMapper">
+
+    <insert id="insert" parameterType="com.flyfish.learnsphere.model.entity.LlmFeedback" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO llm_feedback(teacher_id, course_id, session_id, question, original_answer,
+                                 corrected_answer, rating, comment, status, create_time, update_time)
+        VALUES (#{teacherId}, #{courseId}, #{sessionId}, #{question}, #{originalAnswer},
+                #{correctedAnswer}, #{rating}, #{comment}, #{status}, NOW(), NOW())
+    </insert>
+
+    <update id="update" parameterType="com.flyfish.learnsphere.model.entity.LlmFeedback">
+        UPDATE llm_feedback
+        <set>
+            <if test="correctedAnswer != null">
+                corrected_answer = #{correctedAnswer},
+            </if>
+            <if test="rating != null">
+                rating = #{rating},
+            </if>
+            <if test="comment != null">
+                comment = #{comment},
+            </if>
+            <if test="status != null">
+                status = #{status},
+            </if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <select id="getById" resultType="com.flyfish.learnsphere.model.entity.LlmFeedback">
+        SELECT id,
+               teacher_id AS teacherId,
+               course_id AS courseId,
+               session_id AS sessionId,
+               question,
+               original_answer AS originalAnswer,
+               corrected_answer AS correctedAnswer,
+               rating,
+               comment,
+               status,
+               create_time AS createTime,
+               update_time AS updateTime
+        FROM llm_feedback
+        WHERE id = #{id}
+    </select>
+
+    <select id="listByCourse" resultType="com.flyfish.learnsphere.model.entity.LlmFeedback">
+        SELECT id,
+               teacher_id AS teacherId,
+               course_id AS courseId,
+               session_id AS sessionId,
+               question,
+               original_answer AS originalAnswer,
+               corrected_answer AS correctedAnswer,
+               rating,
+               comment,
+               status,
+               create_time AS createTime,
+               update_time AS updateTime
+        FROM llm_feedback
+        WHERE course_id = #{courseId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="listByTeacher" resultType="com.flyfish.learnsphere.model.entity.LlmFeedback">
+        SELECT id,
+               teacher_id AS teacherId,
+               course_id AS courseId,
+               session_id AS sessionId,
+               question,
+               original_answer AS originalAnswer,
+               corrected_answer AS correctedAnswer,
+               rating,
+               comment,
+               status,
+               create_time AS createTime,
+               update_time AS updateTime
+        FROM llm_feedback
+        WHERE teacher_id = #{teacherId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="listAll" resultType="com.flyfish.learnsphere.model.entity.LlmFeedback">
+        SELECT id,
+               teacher_id AS teacherId,
+               course_id AS courseId,
+               session_id AS sessionId,
+               question,
+               original_answer AS originalAnswer,
+               corrected_answer AS correctedAnswer,
+               rating,
+               comment,
+               status,
+               create_time AS createTime,
+               update_time AS updateTime
+        FROM llm_feedback
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM llm_feedback WHERE id = #{id}
+    </delete>
+
+</mapper>

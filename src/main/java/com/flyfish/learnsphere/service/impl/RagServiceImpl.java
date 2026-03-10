@@ -4,6 +4,7 @@ import com.flyfish.learnsphere.exception.BusinessException;
 import com.flyfish.learnsphere.model.enums.ErrorCode;
 import com.flyfish.learnsphere.model.vo.ChunkVO;
 import com.flyfish.learnsphere.model.vo.KnowledgeIndexStatusVO;
+import com.flyfish.learnsphere.model.vo.RetrievalChunkVO;
 import com.flyfish.learnsphere.service.RagService;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import lombok.extern.slf4j.Slf4j;
@@ -130,6 +131,45 @@ public class RagServiceImpl implements RagService {
                 courseId, pgVector, TOP_K
         );
         log.info("Retrieved {} relevant chunks for courseId={}", results.size(), courseId);
+        return results;
+    }
+
+    @Override
+    public List<RetrievalChunkVO> retrieveRelevantChunksWithScore(Long courseId, String question) {
+        if (courseId == null || question == null || question.trim().isEmpty()) {
+            return List.of();
+        }
+
+        Integer count = vectorJdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM course_chunk_embedding WHERE course_id = ?",
+                Integer.class, courseId);
+        if (count == null || count == 0) {
+            log.warn("No embedding index found for courseId={}, falling back to no context", courseId);
+            return List.of();
+        }
+
+        float[] queryVector = embeddingModel.embed(question).content().vector();
+        String pgVector = toPgVectorLiteral(queryVector);
+
+        List<RetrievalChunkVO> results = vectorJdbcTemplate.query(
+                "SELECT text, heading, source, chunk_index, "
+                        + "1 - (embedding <=> ?::vector) AS score "
+                        + "FROM course_chunk_embedding "
+                        + "WHERE course_id = ? "
+                        + "ORDER BY embedding <=> ?::vector "
+                        + "LIMIT ?",
+                (rs, rowNum) -> {
+                    RetrievalChunkVO vo = new RetrievalChunkVO();
+                    vo.setText(rs.getString("text"));
+                    vo.setHeading(rs.getString("heading"));
+                    vo.setSource(rs.getString("source"));
+                    vo.setChunkIndex(rs.getInt("chunk_index"));
+                    vo.setScore(rs.getDouble("score"));
+                    return vo;
+                },
+                pgVector, courseId, pgVector, TOP_K
+        );
+        log.info("Retrieved {} relevant chunks with scores for courseId={}", results.size(), courseId);
         return results;
     }
 

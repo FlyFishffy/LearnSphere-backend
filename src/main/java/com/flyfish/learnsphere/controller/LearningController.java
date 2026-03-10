@@ -8,6 +8,7 @@ import com.flyfish.learnsphere.model.entity.Result;
 import com.flyfish.learnsphere.model.entity.User;
 import com.flyfish.learnsphere.model.enums.ErrorCode;
 import com.flyfish.learnsphere.model.vo.LearningAnalysisVO;
+import com.flyfish.learnsphere.model.vo.LearningRecordVO;
 import com.flyfish.learnsphere.model.vo.LearningReportVO;
 import com.flyfish.learnsphere.service.LearningService;
 import com.flyfish.learnsphere.service.UserService;
@@ -43,7 +44,7 @@ public class LearningController {
     }
 
     @GetMapping("/record/list")
-    public Result<List<LearningRecord>> listRecords(HttpServletRequest httpRequest) {
+    public Result<List<LearningRecordVO>> listRecords(HttpServletRequest httpRequest) {
         User user = userService.getLoginUser(httpRequest);
         return ResultUtils.success(learningService.listRecords(user.getId()));
     }

@@ -9,6 +9,7 @@ import com.flyfish.learnsphere.model.entity.Course;
 import com.flyfish.learnsphere.model.entity.CourseFavorite;
 import com.flyfish.learnsphere.model.entity.LearningRecord;
 import com.flyfish.learnsphere.model.enums.ErrorCode;
+import com.flyfish.learnsphere.model.vo.LearningRecordVO;
 import com.flyfish.learnsphere.model.vo.LearningAnalysisVO;
 import com.flyfish.learnsphere.model.vo.LearningReportVO;
 import com.flyfish.learnsphere.service.LearningService;
@@ -87,8 +88,8 @@ public class LearningServiceImpl implements LearningService {
     }
 
     @Override
-    public List<LearningRecord> listRecords(Long userId) {
-        return learningRecordMapper.listByUser(userId);
+    public List<LearningRecordVO> listRecords(Long userId) {
+        return learningRecordMapper.listByUserWithTitle(userId);
     }
 
     @Override

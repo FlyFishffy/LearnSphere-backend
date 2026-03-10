@@ -7,6 +7,7 @@ import dev.langchain4j.data.message.ChatMessage;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: FlyFish
@@ -37,4 +38,12 @@ public interface ChatService {
      * @return
      */
     List<MessageVO> getSessionHistory(Long userId, String sessionId);
+
+    /**
+     * Batch get session titles (first user message as title) for all given session IDs
+     * @param userId
+     * @param sessionIds
+     * @return Map: sessionId -> title
+     */
+    Map<String, String> getSessionTitles(Long userId, List<String> sessionIds);
 }

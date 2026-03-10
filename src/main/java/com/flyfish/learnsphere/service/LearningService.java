@@ -4,6 +4,7 @@ import com.flyfish.learnsphere.model.dto.UpdateLearningRecordRequest;
 import com.flyfish.learnsphere.model.entity.Course;
 import com.flyfish.learnsphere.model.entity.LearningRecord;
 import com.flyfish.learnsphere.model.vo.LearningAnalysisVO;
+import com.flyfish.learnsphere.model.vo.LearningRecordVO;
 import com.flyfish.learnsphere.model.vo.LearningReportVO;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public interface LearningService {
 
     boolean updateRecord(UpdateLearningRecordRequest request, Long userId);
 
-    List<LearningRecord> listRecords(Long userId);
+    List<LearningRecordVO> listRecords(Long userId);
 
     boolean addFavorite(Long courseId, Long userId);
 

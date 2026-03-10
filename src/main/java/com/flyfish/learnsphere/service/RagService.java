@@ -3,6 +3,7 @@ package com.flyfish.learnsphere.service;
 
 import com.flyfish.learnsphere.model.vo.ChunkVO;
 import com.flyfish.learnsphere.model.vo.KnowledgeIndexStatusVO;
+import com.flyfish.learnsphere.model.vo.RetrievalChunkVO;
 
 import java.util.List;
 
@@ -28,6 +29,11 @@ public interface RagService {
      * Retrieve relevant chunks for a question
      */
     List<String> retrieveRelevantChunks(Long courseId, String question);
+
+    /**
+     * Retrieve relevant chunks with similarity score and source info
+     */
+    List<RetrievalChunkVO> retrieveRelevantChunksWithScore(Long courseId, String question);
 
     /**
      * Delete course knowledge index

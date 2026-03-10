@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: FlyFish
@@ -66,6 +67,20 @@ public class ChatController {
         }
         List<String> sessions = chatService.getSessions(user.getId());
         return ResultUtils.success(sessions);
+    }
+
+    /**
+     * 批量获取会话标题（从每个会话的第一条用户消息中提取）
+     */
+    @GetMapping("/get/session/titles")
+    public Result<Map<String, String>> getSessionTitles(HttpServletRequest request) {
+        User user = userService.getLoginUser(request);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
+        }
+        List<String> sessions = chatService.getSessions(user.getId());
+        Map<String, String> titles = chatService.getSessionTitles(user.getId(), sessions);
+        return ResultUtils.success(titles);
     }
 
     @GetMapping("/get/session/{sessionId}")
