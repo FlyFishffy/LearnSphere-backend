@@ -8,10 +8,16 @@ package com.flyfish.learnsphere.model.enums;
  */
 public enum CourseTag {
 
-    AI(1, "AI"),
-    JAVA(2, "Java"),
-    C_PLUS_PLUS(3, "C++"),
-    GOLANG(4, "Golang");
+    DATA_STRUCTURE(1, "数据结构与算法"),
+    OPERATING_SYSTEM(2, "操作系统"),
+    COMPUTER_NETWORK(3, "计算机网络"),
+    COMPILER(4, "编译原理"),
+    DATABASE(5, "数据库系统"),
+    MACHINE_LEARNING(6, "机器学习"),
+    INFORMATION_SECURITY(7, "信息安全"),
+    COMPUTER_ARCHITECTURE(8, "计算机体系结构"),
+    PROGRAMMING(9, "程序设计"),
+    SIGNAL_PROCESSING(10, "信号处理");
 
     private Integer value;
 

@@ -79,8 +79,11 @@ public class ChatServiceImpl implements ChatService {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         chatMemoryStore.setUserId(userId);
-        List<ChatMessage> history = chatMemoryStore.getMessages(sessionId);
-        String systemPrompt = "你叫FLY FISH AI, 专门用来解决用户的各种问题, 当前网站的创作者是FLY FISH";
+        // Filter out any SystemMessage from history to avoid leaking prompts to users
+        List<ChatMessage> history = chatMemoryStore.getMessages(sessionId).stream()
+                .filter(m -> !(m instanceof SystemMessage))
+                .collect(Collectors.toList());
+        String systemPrompt = "你是LearnSphere平台的AI助教，专注于计算机科学与技术领域的教学辅助。你熟悉数据结构与算法、操作系统、计算机组成原理、编译原理、计算机网络、数据库系统、软件工程、人工智能、信息安全、信号处理等核心课程。你的职责是帮助学生解答课程相关问题，提供专业、准确、易懂的解释。";
         List<ChatMessage> messages = new ArrayList<>();
         messages.add(SystemMessage.systemMessage(systemPrompt));
 
@@ -178,7 +181,11 @@ public class ChatServiceImpl implements ChatService {
                 try{
                     ChatMessage aiMessage = AiMessage.aiMessage(fullAnswer.toString());
                     messages.add(aiMessage);
-                    chatMemoryStore.updateMessages(sessionId, messages);
+                    // Filter out SystemMessage before persisting — prompts should not be stored in chat history
+                    List<ChatMessage> toStore = messages.stream()
+                            .filter(m -> !(m instanceof SystemMessage))
+                            .collect(Collectors.toList());
+                    chatMemoryStore.updateMessages(sessionId, toStore);
                     chatMemoryStore.addSession(userId, sessionId);
                     emitter.send(SseEmitter.event().name("done").data("[DONE]"));
                     emitter.complete();
